@@ -1,0 +1,23 @@
+{
+    "name": "helium/service-manager",
+    "description": "A reusable template for backing custom services with any number of custom engines.",
+    "type": "library",
+    "license": "MIT",
+	"version": "1.0.0",
+    "authors": [
+        {
+            "name": "Nick Rupert",
+            "email": "nick@heliumservices.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "orchestra/testbench": "^5.1"
+    },
+	"autoload": {
+		"psr-4": {
+			"Helium\\ServiceManager\\": "src",
+			"Helium\\ServiceManager\\Tests\\": "tests"
+		}
+	}
+}
