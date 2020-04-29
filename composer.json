@@ -3,7 +3,7 @@
     "description": "A reusable template for backing custom services with any number of custom engines.",
     "type": "library",
     "license": "MIT",
-	"version": "1.0.0",
+	"version": "1.0.1",
     "authors": [
         {
             "name": "Nick Rupert",

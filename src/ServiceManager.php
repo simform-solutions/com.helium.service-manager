@@ -2,24 +2,46 @@
 
 namespace Helium\ServiceManager;
 
+use Helium\ServiceManager\Exceptions\InvalidEngineException;
 use Helium\ServiceManager\Exceptions\UnknownEngineException;
 
 abstract class ServiceManager
 {
 	//region Base
-	protected $defaultEngine;
+	protected $defaultEngine = 'default';
+	protected $instanceDefaultEngine;
 	protected $engines = [];
 
-	public function __construct($key)
+	public function __construct(string $defaultEngine = null)
 	{
-		$this->defaultEngine = $key;
+		$this->instanceDefaultEngine = $defaultEngine ?? $this->defaultEngine;
+
+		$this->extend(
+			$this->instanceDefaultEngine,
+			$this->createDefaultEngine()
+		);
 	}
 
 	/**
 	 * @description Create a ready-to-use ServiceManager instance
 	 * @return static
 	 */
-	public abstract static function create(): ServiceManager;
+	public static function create(): ServiceManager
+	{
+		return new static();
+	}
+
+	/**
+	 * @description Get the classname of your service engine contract
+	 * @return string
+	 */
+	public abstract function getEngineContract(): string;
+
+	/**
+	 * @description Create the default engine for your service
+	 * @return EngineContract
+	 */
+	protected abstract function createDefaultEngine(): EngineContract;
 	//endregion
 
 	//region Engines
@@ -31,6 +53,15 @@ abstract class ServiceManager
 	 */
 	public function extend(string $key, EngineContract $engine): ServiceManager
 	{
+		if (!is_a($engine, $this->getEngineContract()))
+		{
+			throw new InvalidEngineException(
+				$key,
+				$this->getEngineContract(),
+				get_class($engine)
+			);
+		}
+
 		$this->engines[$key] = $engine;
 
 		return $this;
@@ -46,7 +77,7 @@ abstract class ServiceManager
 		/**
 		 * If no key is specified, use the default
 		 */
-		$key = $key ?? $this->defaultEngine;
+		$key = $key ?? $this->instanceDefaultEngine;
 
 		/**
 		 * If the specified engine does not exist, throw an exception

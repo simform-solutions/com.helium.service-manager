@@ -2,6 +2,7 @@
 
 namespace Helium\ServiceManager\Tests\Fakes;
 
+use Helium\ServiceManager\EngineContract;
 use Helium\ServiceManager\ServiceManager;
 
 /**
@@ -9,9 +10,14 @@ use Helium\ServiceManager\ServiceManager;
  */
 class FakeServiceManager extends ServiceManager
 {
-	public static function create(): ServiceManager
+	public function getEngineContract(): string
 	{
-		return new FakeServiceManager();
+		return FakeEngineContract::class;
+	}
+
+	protected function createDefaultEngine(): EngineContract
+	{
+		return new FakeEngine();
 	}
 
 	public function chainMethod(): FakeEngineContract

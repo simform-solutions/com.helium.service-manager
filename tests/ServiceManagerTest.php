@@ -14,8 +14,6 @@ class ServiceManagerTest extends ServiceManagerPackageTest
 	{
 		$manager = new FakeServiceManager('fake');
 
-		$manager->extend('fake', $this->getNewEngine());
-
 		return $manager;
 	}
 

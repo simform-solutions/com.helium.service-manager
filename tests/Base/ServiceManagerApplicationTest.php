@@ -4,8 +4,10 @@ namespace Helium\ServiceManager\Tests\Base;
 
 use Exception;
 use Helium\ServiceManager\EngineContract;
+use Helium\ServiceManager\Exceptions\InvalidEngineException;
 use Helium\ServiceManager\Exceptions\UnknownEngineException;
 use Helium\ServiceManager\ServiceManager;
+use Helium\ServiceManager\Tests\Fakes\NotAnEngine;
 use Illuminate\Foundation\Testing\TestCase;
 
 abstract class ServiceManagerApplicationTest extends TestCase
@@ -31,7 +33,7 @@ abstract class ServiceManagerApplicationTest extends TestCase
 		$manager = $this->getInstance();
 
 		$this->assertInstanceOf(
-			get_class($this->getNewEngine()),
+			$manager->getEngineContract(),
 			$manager->engine()
 		);
 	}
@@ -64,6 +66,23 @@ abstract class ServiceManagerApplicationTest extends TestCase
 		{
 			$this->assertInstanceOf(UnknownEngineException::class, $e);
 			$this->assertStringContainsString('unknownEngine', $e->getMessage());
+		}
+	}
+
+	public function testInvalidEngineThrowsException()
+	{
+		$manager = $this->getInstance();
+
+		try
+		{
+			$engine = $manager->extend('notAnEngine', new NotAnEngine);
+
+			$this->assertTrue(false);
+		}
+		catch (Exception $e)
+		{
+			$this->assertInstanceOf(InvalidEngineException::class, $e);
+			$this->assertStringContainsString('notAnEngine', $e->getMessage());
 		}
 	}
 }
