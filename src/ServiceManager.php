@@ -8,40 +8,19 @@ use Helium\ServiceManager\Exceptions\UnknownEngineException;
 abstract class ServiceManager
 {
 	//region Base
-	protected $defaultEngine = 'default';
-	protected $instanceDefaultEngine;
-	protected $engines = [];
+	protected static $engines = [];
 
-	public function __construct(string $defaultEngine = null)
-	{
-		$this->instanceDefaultEngine = $defaultEngine ?? $this->defaultEngine;
-
-		$this->extend(
-			$this->instanceDefaultEngine,
-			$this->createDefaultEngine()
-		);
-	}
-
-	/**
-	 * @description Create a ready-to-use ServiceManager instance
-	 * @return static
-	 */
-	public static function create(): ServiceManager
-	{
-		return new static();
-	}
+    /**
+     * @description Get the name of the default engine
+     * @return string
+     */
+	abstract protected static function getDefaultEngineName(): string;
 
 	/**
 	 * @description Get the classname of your service engine contract
 	 * @return string
 	 */
-	public abstract function getEngineContract(): string;
-
-	/**
-	 * @description Create the default engine for your service
-	 * @return EngineContract
-	 */
-	protected abstract function createDefaultEngine(): EngineContract;
+	abstract protected static function getEngineContract(): string;
 	//endregion
 
 	//region Engines
@@ -49,22 +28,19 @@ abstract class ServiceManager
 	 * @description Inject engine dependency
 	 * @param string $key
 	 * @param EngineContract $engine
-	 * @return static
 	 */
-	public function extend(string $key, EngineContract $engine): ServiceManager
+	public static function extend(string $key, EngineContract $engine)
 	{
-		if (!is_a($engine, $this->getEngineContract()))
+		if (!is_a($engine, static::getEngineContract()))
 		{
 			throw new InvalidEngineException(
 				$key,
-				$this->getEngineContract(),
+				static::getEngineContract(),
 				get_class($engine)
 			);
 		}
 
-		$this->engines[$key] = $engine;
-
-		return $this;
+		self::$engines[$key] = $engine;
 	}
 
 	/**
@@ -72,22 +48,22 @@ abstract class ServiceManager
 	 * @param string|null $key
 	 * @return EngineContract
 	 */
-	public function engine(string $key = null): EngineContract
+	public static function engine(string $key = null): EngineContract
 	{
 		/**
 		 * If no key is specified, use the default
 		 */
-		$key = $key ?? $this->instanceDefaultEngine;
+		$key = $key ?? static::getDefaultEngineName();
 
 		/**
 		 * If the specified engine does not exist, throw an exception
 		 */
-		if (!isset($this->engines[$key]))
+		if (!isset(self::$engines[$key]))
 		{
 			throw new UnknownEngineException(static::class, $key);
 		}
 
-		return $this->engines[$key];
+		return self::$engines[$key];
 	}
 	//endregion
 }

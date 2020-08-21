@@ -3,14 +3,14 @@
     "description": "A reusable template for backing custom services with any number of custom engines.",
     "type": "library",
     "license": "MIT",
-	"version": "1.0.1",
     "authors": [
         {
             "name": "Nick Rupert",
             "email": "nick@heliumservices.com"
         }
     ],
-    "require": {},
+    "require": {
+    },
     "require-dev": {
         "orchestra/testbench": "^5.1"
     },
